@@ -8,6 +8,66 @@
     <title>Weather App</title>
   </head>
   <body>
+    <div class="flex justify-center items-center h-screen w-screen">
+      <div class="container flex w-3/4 h-180 rounded-2xl">
+        <div
+          class="flex items-end pl-20 pb-20 w-4/6 h-full bg-[url('img/weather-hero-img.jpg')] bg-top bg-cover"
+          id="weather-hero"
+        >
+          <p class="text-8xl mr-4" id="hero-degrees">26</p>
+          <div class="flex-col pb-4" id="hero-city-information">
+            <p id="hero-city">London</p>
+            <p id="hero-date">10/31/22</p>
+          </div>
+        </div>
+        <div class="w-2/6 bg-gray-700 text-white" id="search-bar-container">
+          <div>
+            <form class="h-12">
+              <label for="search-bar">
+                <input
+                  class="h-full w-3/4 m-0 pl-4 bg-gray-800"
+                  type="text"
+                  id="search-bar"
+                  placeholder="Enter City..."
+                />
+                <button class="h-full bg-gray-800" id="search-btn">
+                  Search
+                </button>
+              </label>
+            </form>
+          </div>
+          <div class="h-2/5" id="recent-search">
+            <ul>
+              <li>London</li>
+              <li>Arizona</li>
+              <li>Salt Lake</li>
+              <li>Perth</li>
+            </ul>
+          </div>
+          <div class="h-2/5" id="weather-deatils">
+            <section class="ml-4 mb-8">
+              <h3>Weather Details</h3>
+            </section>
+            <section class="flex justify-between mx-4 mb-5">
+              <p>Temp</p>
+              <p>26</p>
+            </section>
+            <section class="flex justify-between mx-4 mb-5">
+              <p>Wind</p>
+              <p>8.37mph</p>
+            </section>
+            <section class="flex justify-between mx-4 mb-5">
+              <p>Humidity</p>
+              <p>46%</p>
+            </section>
+            <section class="flex justify-between mx-4 mb-5">
+              <p>UV Index</p>
+              <p>0.47</p>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
     <script src="./assets/scripts/app.js"></script>
   </body>
 </html>
