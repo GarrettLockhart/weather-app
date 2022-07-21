@@ -1,27 +1,17 @@
 $(document).ready(function () {
   const buttonEl = $('#search-btn');
 
-  // function getApi(apiUrl) {
-  //   // var apiUrl =
-  //   //   'https://api.openweathermap.org/data/2.5/onecall?q=herriman&exclude=hourly,daily&units=imperial&appid=2982e9f47454e5c045e02187e945c729';
-
-  //   var apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${searchInput}&units=imperial&exclude-hourly,daily&appid=2982e9f47454e5c045e02187e945c729`;
-
-  //   fetch(apiUrl)
-  //     .then(function (response) {
-  //       console.log(response);
-  //       return response.json();
-  //     })
-  //     .then(function (data) {
-  //       console.log(data);
-  //     });
-  // }
+  var searchInputArray = [];
 
   $(buttonEl).on('click', function (e) {
     e.preventDefault();
-    var searchInput = $(this).siblings().find('#search-bar').val();
+    var searchInput = $(this).siblings('#search-bar-el').children().val();
+    searchInputArray.push(searchInput);
 
-    var apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${searchInput}&units=imperial&exclude-hourly,daily&appid=2982e9f47454e5c045e02187e945c729`;
+    $('#hero-intro-title').removeClass('flex').addClass('hidden');
+    $('#cards-display').removeClass('hidden').addClass('flex');
+
+    var apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${searchInput}&units=imperial&appid=2982e9f47454e5c045e02187e945c729`;
 
     fetch(apiUrl)
       .then(function (response) {
@@ -32,8 +22,13 @@ $(document).ready(function () {
             displayWeather(data, searchInput);
           });
         } else {
-          var errorMsg = $('<span>Not found, Please try again</span>');
-          $('#recent-search').append(errorMsg);
+          var errorMsgEl = $('<span>');
+          $(errorMsgEl).text('Not Found, Please try again');
+          $('#recent-search').append(errorMsgEl);
+
+          setTimeout(function (errorMsg) {
+            $(errorMsgEl).text('');
+          }, 5000);
         }
       })
       .catch(function (error) {
@@ -42,13 +37,26 @@ $(document).ready(function () {
   });
 
   function displayWeather(data, searchInput) {
+    var degree = '\u{000B0}';
+    var percent = '\u{00025}';
     var temp = Math.floor(data.main.temp);
-    $('#hero-degrees').text(temp);
-    $('#weather-details-degrees').text(data.main.temp);
-    $('#weather-details-wind').text(data.wind.speed + ' ' + 'mph');
-    // $('#weather-details-humidity').text(data.main.humidity);
+    var wind = data.wind.speed;
+    var humidity = data.main.humidity;
+    // ! var UVIndex = data.hourly.uvi;
+    $('#hero-degrees').text(`${temp} ${degree}`);
+    $('#weather-details-degrees').text(`${temp} ${degree}`);
+    $('#weather-details-wind').text(wind + ' ' + 'mph');
+    $('#weather-details-humidity').text(`${humidity} ${percent}`);
+    // ! $('#weather-details-uvindex').text(`${UVIndex}`);
+
+    $('#hero-city').text(data.name);
+
+    var date = moment().format('MMMM Do YYYY');
+    $('#hero-date').text(date);
+
     var liEl = $('<li>');
     $(liEl).text(searchInput);
+    $(liEl).addClass('mb-3');
     $('#recent-search').append(liEl);
   }
 });
