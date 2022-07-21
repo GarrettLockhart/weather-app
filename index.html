@@ -17,7 +17,13 @@
   <body class="bg-[url('img/weather-hero-img.jpg')] bg-top bg-cover">
     <div class="flex w-screen h-screen rounded-2xl">
       <div class="text-white w-4/6 h-full" id="weather-hero">
-        <div class="flex justify-center mt-3">
+        <div
+          id="hero-intro-title"
+          class="flex h-full justify-center items-center text-6xl"
+        >
+          <h1>Find The weather (almost) anywhere!</h1>
+        </div>
+        <div id="cards-display" class="hidden justify-center mt-3">
           <div
             class="cards rounded-lg border-gray-500 border-2 border-solid h-20% w-15% py-1 m-3 bg-gray-800 bg-opacity-40 backdrop-blur-md"
           >
@@ -138,16 +144,16 @@
           class="absolute bottom-32 left-40 flex pb-4"
           id="hero-city-information"
         >
-          <h2 class="text-9xl mr-10" id="hero-degrees">26</h2>
+          <h2 class="text-9xl mr-10" id="hero-degrees"></h2>
           <div class="flex flex-col justify-center">
-            <p class="text-4xl" id="hero-city">London</p>
-            <p class="text-2xl" id="hero-date">10/31/22</p>
+            <p class="text-4xl" id="hero-city"></p>
+            <p class="text-2xl" id="hero-date"></p>
           </div>
         </div>
       </div>
       <div class="w-2/6 text-white bg-gray-900" id="search-bar-container">
         <form class="w-full h-16 flex">
-          <label class="w-3/4" for="search-bar">
+          <label class="w-3/4" for="search-bar" id="search-bar-el">
             <input
               class="h-full w-full m-0 pl-4 focus:bg-opacity-70 outline-none bg-black bg-opacity-40 backdrop-blur-md"
               type="text"
@@ -162,7 +168,7 @@
             <i class="text-2xl fa-solid fa-magnifying-glass"></i>
           </button>
         </form>
-        <div class="h-2/5 p-12">
+        <div class="h-2/5 p-12 overflow-auto">
           <ul id="recent-search" class="mt-8 text-lg"></ul>
         </div>
         <div class="h-2/5 p-12 text-lg" id="weather-deatils">
@@ -183,7 +189,7 @@
           </section>
           <section class="flex justify-between mb-8">
             <p>UV Index</p>
-            <p id="weather-details-humidity"></p>
+            <p id="weather-details-uvindex"></p>
           </section>
         </div>
       </div>
@@ -194,6 +200,7 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
     <script src="./assets/scripts/app.js"></script>
   </body>
 </html>
