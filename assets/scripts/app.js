@@ -1,25 +1,27 @@
 $(document).ready(function () {
+  var apiKey = '2982e9f47454e5c045e02187e945c729';
+
   const buttonEl = $('#search-btn');
 
   var searchInputArray = [];
 
-  $(buttonEl).on('click', function (e) {
-    e.preventDefault();
+  $(buttonEl).on('click', function (evt) {
+    evt.preventDefault();
     var searchInput = $(this).siblings('#search-bar-el').children().val();
     searchInputArray.push(searchInput);
 
-    $('#hero-intro-title').removeClass('flex').addClass('hidden');
-    $('#cards-display').removeClass('hidden').addClass('flex');
+    var apiCoordsUrl = `https://api.openweathermap.org/data/2.5/weather?q=${searchInput}&units=imperial&appid=${apiKey}`;
 
-    var apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${searchInput}&units=imperial&appid=2982e9f47454e5c045e02187e945c729`;
-
-    fetch(apiUrl)
+    fetch(apiCoordsUrl)
       .then(function (response) {
+        console.log('🚀 ~ file: app.js ~ line 15 ~ response', response);
         if (response.ok) {
-          console.log(response);
           response.json().then(function (data) {
-            console.log(data);
-            displayWeather(data, searchInput);
+            console.log('🚀 ~ file: app.js ~ line 20 ~ data', data);
+            $('#hero-intro-title').removeClass('flex').addClass('hidden');
+            $('#cards-display').removeClass('hidden').addClass('flex');
+            $('#hero-city').text(data.name);
+            geoCoords(data);
           });
         } else {
           var errorMsgEl = $('<span>');
@@ -36,23 +38,76 @@ $(document).ready(function () {
       });
   });
 
-  function displayWeather(data, searchInput) {
-    var degree = '\u{000B0}';
-    var percent = '\u{00025}';
-    var temp = Math.floor(data.main.temp);
-    var wind = data.wind.speed;
-    var humidity = data.main.humidity;
-    // ! var UVIndex = data.hourly.uvi;
-    $('#hero-degrees').text(`${temp} ${degree}`);
-    $('#weather-details-degrees').text(`${temp} ${degree}`);
-    $('#weather-details-wind').text(wind + ' ' + 'mph');
-    $('#weather-details-humidity').text(`${humidity} ${percent}`);
-    // ! $('#weather-details-uvindex').text(`${UVIndex}`);
+  function geoCoords(data) {
+    latCoords = data.coord.lat;
+    console.log(
+      '🚀 ~ file: app.js ~ line 68 ~ geoCoords ~ latCoords',
+      latCoords
+    );
+    lonCoords = data.coord.lon;
+    console.log(
+      '🚀 ~ file: app.js ~ line 70 ~ geoCoords ~ lonCoords',
+      lonCoords
+    );
 
-    $('#hero-city').text(data.name);
+    //  todo: Get this second call working properly
 
-    var date = moment().format('MMMM Do YYYY');
-    $('#hero-date').text(date);
+    var apiUrlOneCall = `https://api.openweathermap.org/data/2.5/onecall?lat=${latCoords}&lon=${lonCoords}&units=imperial&appid=${apiKey}`;
+
+    fetch(apiUrlOneCall)
+      .then(function (response) {
+        console.log('🚀 ~ file: app.js ~ line 15 ~ response', response);
+        if (response.ok) {
+          response.json().then(function (dataWeather) {
+            console.log(
+              '🚀 ~ file: app.js ~ line 61 ~ dataWeather',
+              dataWeather
+            );
+            displayWeather(dataWeather);
+          });
+        } else {
+          var errorMsgEl = $('<span>');
+          $(errorMsgEl).text('Not Found, Please try again');
+          $('#recent-search').append(errorMsgEl);
+
+          setTimeout(function (errorMsg) {
+            $(errorMsgEl).text('');
+          }, 5000);
+        }
+      })
+      .catch(function (error) {
+        console.log('Unable to connect to OpenWeather API');
+      });
+
+    return latCoords, lonCoords;
+  }
+
+  function displayWeather(dataWeather, searchInput) {
+    var weatherDetailsData = {
+      degreeSym: '\u{000B0}',
+      percentSym: '\u{00025}',
+      temp: Math.floor(dataWeather.current.temp),
+      wind: dataWeather.current.wind_speed,
+      humidity: dataWeather.current.humidity,
+      uvIndex: dataWeather.current.uvi,
+      currentDate: moment.unix(dataWeather.current.dt).format('MMMM Do YYYY'),
+    };
+
+    $('#hero-degrees').text(
+      `${weatherDetailsData.temp} ${weatherDetailsData.degreeSym}`
+    );
+    $('#weather-details-degrees').text(
+      `${weatherDetailsData.temp} ${weatherDetailsData.degreeSym}`
+    );
+    $('#weather-details-wind').text(`${weatherDetailsData.wind} mph`);
+    $('#weather-details-humidity').text(
+      `${weatherDetailsData.humidity} ${weatherDetailsData.percentSym}`
+    );
+    $('#weather-details-uvindex').text(`${weatherDetailsData.uvIndex}`);
+
+    $('#hero-date').text(weatherDetailsData.currentDate);
+
+    // FIXME: Create list that is clickable and re-calls api
 
     var liEl = $('<li>');
     $(liEl).text(searchInput);
