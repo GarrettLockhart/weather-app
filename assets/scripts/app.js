@@ -54,10 +54,6 @@ $(document).ready(function () {
       .then(function (response) {
         if (response.ok) {
           response.json().then(function (dataWeather) {
-            console.log(
-              '🚀 ~ file: app.js ~ line 57 ~ dataWeather',
-              dataWeather
-            );
             displayWeather(dataWeather);
             displayForecast(dataWeather);
           });
@@ -101,7 +97,7 @@ $(document).ready(function () {
   function displayForecast(dataWeather) {
     for (let i = 0; i < 5; i++) {
       Object.entries(dataWeather.daily[i]).forEach(([key, value]) => {
-        console.log(`${key}: ${value}`);
+        // console.log(`${key}: ${value}`);
       });
     }
   }
