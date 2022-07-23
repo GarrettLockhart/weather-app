@@ -5,9 +5,8 @@ $(document).ready(function () {
   var i = 0;
   var searchInputArray = [];
 
-  $(buttonEl).on('click', searchInputFunc);
   // stores user input from the search bar, uses that to make a call to get the lat and lon coordinates
-  function searchInputFunc(evt) {
+  $(buttonEl).click(function (evt) {
     evt.preventDefault();
     var searchInput = $(this).siblings('#search-bar-el').children().val();
     searchInputArray.push(searchInput);
@@ -37,7 +36,8 @@ $(document).ready(function () {
       .catch(function (error) {
         console.log('Unable to connect to OpenWeather API');
       });
-  }
+    $('#search-bar').val('');
+  });
 
   // a function to take the lat and long coords from the first call above and use those to make a second call to a different endpoint
   function geoCoords(data) {
@@ -47,7 +47,7 @@ $(document).ready(function () {
 
     //  todo: Get this second call working properly
 
-    var apiUrlOneCall = `https://api.openweathermap.org/data/2.5/onecall?lat=${latCoords}&lon=${lonCoords}&units=imperial&appid=${apiKey}`;
+    var apiUrlOneCall = `https://api.openweathermap.org/data/2.5/onecall?lat=${latCoords}&lon=${lonCoords}&exclude=minutely,hourly,alerts&units=imperial&appid=${apiKey}`;
 
     // this call uses the lat and lon coordinates provided by the first call above
     fetch(apiUrlOneCall)
@@ -59,6 +59,7 @@ $(document).ready(function () {
               dataWeather
             );
             displayWeather(dataWeather);
+            displayForecast(dataWeather);
           });
         }
       })
@@ -71,7 +72,7 @@ $(document).ready(function () {
 
   // Takes in the second fetch call and returns temp, wind, humidity, uvindex, and 5 day forecast
   function displayWeather(dataWeather) {
-    var weatherDetailsData = {
+    var currentWeatherData = {
       degreeSym: '\u{000B0}',
       percentSym: '\u{00025}',
       temp: Math.floor(dataWeather.current.temp),
@@ -81,20 +82,28 @@ $(document).ready(function () {
       currentDate: moment.unix(dataWeather.current.dt).format('MMMM Do YYYY'),
     };
 
-    // pulls from the weatherDetailsData object and displays to page
+    // pulls from the currentWeatherData object and displays to page
     $('#hero-degrees').text(
-      `${weatherDetailsData.temp} ${weatherDetailsData.degreeSym}`
+      `${currentWeatherData.temp} ${currentWeatherData.degreeSym}`
     );
     $('#weather-details-degrees').text(
-      `${weatherDetailsData.temp} ${weatherDetailsData.degreeSym}`
+      `${currentWeatherData.temp} ${currentWeatherData.degreeSym}`
     );
-    $('#weather-details-wind').text(`${weatherDetailsData.wind} mph`);
+    $('#weather-details-wind').text(`${currentWeatherData.wind} mph`);
     $('#weather-details-humidity').text(
-      `${weatherDetailsData.humidity} ${weatherDetailsData.percentSym}`
+      `${currentWeatherData.humidity} ${currentWeatherData.percentSym}`
     );
-    $('#weather-details-uvindex').text(`${weatherDetailsData.uvIndex}`);
+    $('#weather-details-uvindex').text(`${currentWeatherData.uvIndex}`);
 
-    $('#hero-date').text(weatherDetailsData.currentDate);
+    $('#hero-date').text(currentWeatherData.currentDate);
+  }
+
+  function displayForecast(dataWeather) {
+    for (let i = 0; i < 5; i++) {
+      Object.entries(dataWeather.daily[i]).forEach(([key, value]) => {
+        console.log(`${key}: ${value}`);
+      });
+    }
   }
 
   // Call the data again if the user click on the recent searches buttons
