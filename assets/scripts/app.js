@@ -6,7 +6,7 @@ $(document).ready(function () {
   var searchInputArray = [];
 
   $(buttonEl).on('click', searchInputFunc);
-  // stores use input from the search bar, uses that to make a call to get the lat and lon coordinates
+  // stores user input from the search bar, uses that to make a call to get the lat and lon coordinates
   function searchInputFunc(evt) {
     evt.preventDefault();
     var searchInput = $(this).siblings('#search-bar-el').children().val();
@@ -17,10 +17,8 @@ $(document).ready(function () {
 
     fetch(apiCoordsUrl)
       .then(function (response) {
-        console.log('🚀 ~ file: app.js ~ line 15 ~ response', response);
         if (response.ok) {
           response.json().then(function (data) {
-            console.log('🚀 ~ file: app.js ~ line 20 ~ data', data);
             $('#hero-intro-title').removeClass('flex').addClass('hidden');
             $('#cards-display').removeClass('hidden').addClass('flex');
             $('#hero-city').text(data.name);
@@ -54,23 +52,14 @@ $(document).ready(function () {
     // this call uses the lat and lon coordinates provided by the first call above
     fetch(apiUrlOneCall)
       .then(function (response) {
-        console.log('🚀 ~ file: app.js ~ line 15 ~ response', response);
         if (response.ok) {
           response.json().then(function (dataWeather) {
             console.log(
-              '🚀 ~ file: app.js ~ line 61 ~ dataWeather',
+              '🚀 ~ file: app.js ~ line 57 ~ dataWeather',
               dataWeather
             );
             displayWeather(dataWeather);
           });
-        } else {
-          var errorMsgEl = $('<span>');
-          $(errorMsgEl).text('Not Found, Please try again');
-          $('#recent-search').append(errorMsgEl);
-
-          setTimeout(function (errorMsg) {
-            $(errorMsgEl).text('');
-          }, 5000);
         }
       })
       .catch(function (error) {
@@ -81,7 +70,7 @@ $(document).ready(function () {
   }
 
   // Takes in the second fetch call and returns temp, wind, humidity, uvindex, and 5 day forecast
-  function displayWeather(dataWeather, searchInput) {
+  function displayWeather(dataWeather) {
     var weatherDetailsData = {
       degreeSym: '\u{000B0}',
       percentSym: '\u{00025}',
@@ -108,13 +97,32 @@ $(document).ready(function () {
     $('#hero-date').text(weatherDetailsData.currentDate);
   }
 
-  // create a button for each search that is input
+  // Call the data again if the user click on the recent searches buttons
+  $('#recent-search').on('click', function (e) {
+    e.preventDefault();
+    let recentSearchBtn = $(e.target).text();
 
+    var apiCoordsRecentUrl = `https://api.openweathermap.org/data/2.5/weather?q=${recentSearchBtn}&units=imperial&appid=${apiKey}`;
+
+    fetch(apiCoordsRecentUrl)
+      .then(function (response) {
+        if (response.ok) {
+          response.json().then(function (data) {
+            $('#hero-city').text(data.name);
+            geoCoords(data);
+          });
+        }
+      })
+      .catch(function (error) {
+        console.log('Unable to connect to OpenWeather API');
+      });
+  });
+
+  // create a button for each search that is input
   function recentSearch() {
     if (i < searchInputArray.length) {
       var recentBtn = $('<button>');
       $(recentBtn).text(searchInputArray[i]).addClass('custom-recent-btn');
-      $(recentBtn).attr('onclick', 'searchInputFunc()');
       $('#recent-search').append(recentBtn);
       i++;
     }
