@@ -2,6 +2,7 @@ $(document).ready(function () {
   var apiKey = '2982e9f47454e5c045e02187e945c729';
 
   const buttonEl = $('#search-btn');
+  var weatherForecastEl = $('#cards-display');
   var i = 0;
   var searchInputArray = [];
 
@@ -19,7 +20,7 @@ $(document).ready(function () {
         if (response.ok) {
           response.json().then(function (data) {
             $('#hero-intro-title').removeClass('flex').addClass('hidden');
-            $('#cards-display').removeClass('hidden').addClass('flex');
+
             $('#hero-city').text(data.name);
             geoCoords(data);
           });
@@ -55,7 +56,12 @@ $(document).ready(function () {
         if (response.ok) {
           response.json().then(function (dataWeather) {
             displayWeather(dataWeather);
-            displayForecast(dataWeather);
+            console.log(
+              '🚀 ~ file: app.js ~ line 58 ~ dataWeather',
+              dataWeather
+            );
+            // displayForecast(dataWeather);
+            getForecast(dataWeather);
           });
         }
       })
@@ -94,11 +100,27 @@ $(document).ready(function () {
     $('#hero-date').text(currentWeatherData.currentDate);
   }
 
-  function displayForecast(dataWeather) {
-    for (let i = 0; i < 5; i++) {
-      Object.entries(dataWeather.daily[i]).forEach(([key, value]) => {
-        // console.log(`${key}: ${value}`);
-      });
+  function getForecast(dataWeather) {
+    console.log(
+      '🚀 ~ file: app.js ~ line 104 ~ getForecast ~ dataWeather',
+      dataWeather
+    );
+    for (var i = 1; i < 6; i++) {
+      var unixTime = dataWeather.daily[i].dt;
+      var date = moment.unix(unixTime).format('ddd');
+      $('#Date' + i).html(date);
+
+      var temp = Math.floor(dataWeather.daily[i].temp.day);
+      $('#tempDay' + i).html(temp);
+
+      var wind = Math.floor(dataWeather.daily[i].wind_speed);
+      $('#windDay' + i).html(wind + ' mph');
+
+      var humidity = dataWeather.daily[i].humidity;
+      $('#humidityDay' + i).html(humidity + ' %');
+
+      var uvi = dataWeather.daily[i].uvi;
+      $('#uviDay' + i).html(uvi);
     }
   }
 
