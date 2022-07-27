@@ -59,11 +59,6 @@ $(document).ready(function () {
         if (response.ok) {
           response.json().then(function (dataWeather) {
             displayWeather(dataWeather);
-            console.log(
-              '🚀 ~ file: app.js ~ line 58 ~ dataWeather',
-              dataWeather
-            );
-            // displayForecast(dataWeather);
             getForecast(dataWeather);
           });
         }
@@ -105,10 +100,6 @@ $(document).ready(function () {
 
   // Loop to grab the data for the next five days and update the DOM on each pass of the loop
   function getForecast(dataWeather) {
-    console.log(
-      '🚀 ~ file: app.js ~ line 104 ~ getForecast ~ dataWeather',
-      dataWeather
-    );
     for (var i = 1; i < 6; i++) {
       var unixTime = dataWeather.daily[i].dt;
       var date = moment.unix(unixTime).format('ddd');
