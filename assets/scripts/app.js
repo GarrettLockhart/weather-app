@@ -1,26 +1,28 @@
 $(document).ready(function () {
-  var apiKey = '2982e9f47454e5c045e02187e945c729';
+  var API_KEY = '2982e9f47454e5c045e02187e945c729';
 
   const buttonEl = $('#search-btn');
-  var weatherForecastEl = $('#cards-display');
+
+  // this is used in the recentSearch function
   var i = 0;
+  // used to display the recent search buttons
   var searchInputArray = [];
 
-  // stores user input from the search bar, uses that to make a call to get the lat and lon coordinates
+  // stores user input from the search bar, and pushes searchInput to an array, uses searchInput to make a call to get the lat and lon coordinates
   $(buttonEl).click(function (evt) {
     evt.preventDefault();
     var searchInput = $(this).siblings('#search-bar-el').children().val();
     searchInputArray.push(searchInput);
     recentSearch();
 
-    var apiCoordsUrl = `https://api.openweathermap.org/data/2.5/weather?q=${searchInput}&units=imperial&appid=${apiKey}`;
+    var apiCoordsUrl = `https://api.openweathermap.org/data/2.5/weather?q=${searchInput}&units=imperial&appid=${API_KEY}`;
 
     fetch(apiCoordsUrl)
       .then(function (response) {
         if (response.ok) {
           response.json().then(function (data) {
             $('#hero-intro-title').removeClass('flex').addClass('hidden');
-
+            $('#cards-display').removeClass('hidden').addClass('flex');
             $('#hero-city').text(data.name);
             geoCoords(data);
           });
@@ -28,7 +30,7 @@ $(document).ready(function () {
           var errorMsgEl = $('<span>');
           $(errorMsgEl).text('Not Found, Please try again');
           $('#recent-search').append(errorMsgEl);
-
+          // if error, removed displayed error after 5 seconds
           setTimeout(function (errorMsg) {
             $(errorMsgEl).text('');
           }, 5000);
@@ -40,7 +42,8 @@ $(document).ready(function () {
     $('#search-bar').val('');
   });
 
-  // a function to take the lat and long coords from the first call above and use those to make a second call to a different endpoint
+  // take the lat and lon coords from the first call above and use those to make a second call to a different endpoint
+  // This endpoint contains all the necessary data, but needs the lat and lon coordinates
   function geoCoords(data) {
     latCoords = data.coord.lat;
 
@@ -48,7 +51,7 @@ $(document).ready(function () {
 
     //  todo: Get this second call working properly
 
-    var apiUrlOneCall = `https://api.openweathermap.org/data/2.5/onecall?lat=${latCoords}&lon=${lonCoords}&exclude=minutely,hourly,alerts&units=imperial&appid=${apiKey}`;
+    var apiUrlOneCall = `https://api.openweathermap.org/data/2.5/onecall?lat=${latCoords}&lon=${lonCoords}&exclude=minutely,hourly,alerts&units=imperial&appid=${API_KEY}`;
 
     // this call uses the lat and lon coordinates provided by the first call above
     fetch(apiUrlOneCall)
@@ -72,7 +75,7 @@ $(document).ready(function () {
     return latCoords, lonCoords;
   }
 
-  // Takes in the second fetch call and returns temp, wind, humidity, uvindex, and 5 day forecast
+  // Takes in the second fetch call and sets the text in the DOM, gets temp, wind, humidity, uvindex
   function displayWeather(dataWeather) {
     var currentWeatherData = {
       degreeSym: '\u{000B0}',
@@ -100,6 +103,7 @@ $(document).ready(function () {
     $('#hero-date').text(currentWeatherData.currentDate);
   }
 
+  // Loop to grab the data for the next five days and update the DOM on each pass of the loop
   function getForecast(dataWeather) {
     console.log(
       '🚀 ~ file: app.js ~ line 104 ~ getForecast ~ dataWeather',
@@ -124,12 +128,12 @@ $(document).ready(function () {
     }
   }
 
-  // Call the data again if the user click on the recent searches buttons
+  // Fetch the api again, if the user clicks on the recent searches btn, puts the city as the buttons text
   $('#recent-search').on('click', function (e) {
     e.preventDefault();
     let recentSearchBtn = $(e.target).text();
 
-    var apiCoordsRecentUrl = `https://api.openweathermap.org/data/2.5/weather?q=${recentSearchBtn}&units=imperial&appid=${apiKey}`;
+    var apiCoordsRecentUrl = `https://api.openweathermap.org/data/2.5/weather?q=${recentSearchBtn}&units=imperial&appid=${API_KEY}`;
 
     fetch(apiCoordsRecentUrl)
       .then(function (response) {
